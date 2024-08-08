@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Blockly Python Editor with Variables and Side Console</title>
+  <title>Blockly Python Editor with Improved Variable Handling</title>
   <script src="https://unpkg.com/blockly/blockly.min.js"></script>
   <script src="https://unpkg.com/blockly/python_compressed.js"></script>
   <script src="https://cdn.jsdelivr.net/pyodide/v0.21.3/full/pyodide.js"></script>
@@ -79,8 +79,25 @@
       `
     });
 
+    // Override Blockly's Python generator for variables
+    Blockly.Python['variables_get'] = function(block) {
+      var code = Blockly.Python.variableDB_.getName(block.getFieldValue('VAR'),
+          Blockly.VARIABLE_CATEGORY_NAME);
+      return [code, Blockly.Python.ORDER_ATOMIC];
+    };
+
+    Blockly.Python['variables_set'] = function(block) {
+      var argument0 = Blockly.Python.valueToCode(block, 'VALUE',
+          Blockly.Python.ORDER_NONE) || '0';
+      var varName = Blockly.Python.variableDB_.getName(
+          block.getFieldValue('VAR'), Blockly.VARIABLE_CATEGORY_NAME);
+      return varName + ' = ' + argument0 + '\n';
+    };
+
     function generateCode() {
       var code = Blockly.Python.workspaceToCode(workspace);
+      // Remove any remaining None initializations
+      code = code.replace(/^(\w+) = None\n/gm, '');
       document.getElementById('codeOutput').textContent = code;
     }
 
@@ -115,12 +132,14 @@
 
     async function runCode() {
       const code = Blockly.Python.workspaceToCode(workspace);
+      // Remove any remaining None initializations before running
+      const cleanedCode = code.replace(/^(\w+) = None\n/gm, '');
       const consoleElement = document.getElementById('console');
       consoleElement.innerHTML = ''; // Clear previous output
 
       try {
         // Run the generated Python code
-        await pyodide.runPythonAsync(code);
+        await pyodide.runPythonAsync(cleanedCode);
       } catch (error) {
         consoleElement.innerHTML += `<span style="color: red;">Error: ${error.message}</span>`;
       }
