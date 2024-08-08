@@ -53,6 +53,14 @@
         },
         {
           kind: "category",
+          name: "User Input",
+          colour: 160,
+          contents: [
+            { kind: "block", type: "user_input" }
+          ]
+        },
+        {
+          kind: "category",
           name: "Lists",
           colour: "%{BKY_LISTS_HUE}",
           contents: [
@@ -178,6 +186,9 @@
                   element.innerHTML += text
 
           sys.stdout = WebConsole()
+
+          async def input(prompt_text):
+                return await prompt(prompt_text)
         `);
       } catch (error) {
         console.error("Failed to load Pyodide:", error);
@@ -189,18 +200,31 @@
 
     async function runCode() {
       const code = Blockly.Python.workspaceToCode(workspace);
-      // Remove any remaining None initializations before running
       const cleanedCode = code.replace(/^(\w+) = None\n/gm, '');
       const consoleElement = document.getElementById('console');
       consoleElement.innerHTML = ''; // Clear previous output
 
       try {
-        // Run the generated Python code
-        await pyodide.runPythonAsync(cleanedCode);
+        // Wrap the code in an async function to allow for await
+        const wrappedCode = `
+async def __main__():
+    ${cleanedCode.replace(/^/gm, '    ')}
+
+asyncio.ensure_future(__main__())
+`;
+        await pyodide.runPythonAsync(wrappedCode);
       } catch (error) {
         consoleElement.innerHTML += `<span style="color: red;">Error: ${error.message}</span>`;
       }
     }
+
+    // Override the browser's prompt function to handle user input
+    window.prompt = function(text) {
+      return new Promise((resolve) => {
+        const userInput = window.prompt(text);
+        resolve(userInput);
+      });
+    };
   </script>
 </body>
 </html>
