@@ -1,45 +1,91 @@
 <!DOCTYPE html>
-   <html>
-   <head>
-     <meta charset="utf-8">
-     <title>Blockly Python Editor</title>
-     <script src="https://unpkg.com/blockly/blockly.min.js"></script>
-     <script src="https://unpkg.com/blockly/python_compressed.js"></script>
-   </head>
-   <body>
-     <div id="blocklyDiv" style="height: 480px; width: 600px;"></div>
-     <button onclick="generateCode()">Generate Python Code</button>
-     <pre id="codeOutput"></pre>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Blockly Python Editor with Console</title>
+  <script src="https://unpkg.com/blockly/blockly.min.js"></script>
+  <script src="https://unpkg.com/blockly/python_compressed.js"></script>
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.21.3/full/pyodide.js"></script>
+  <style>
+    #container { display: flex; height: 600px; }
+    #blocklyDiv { flex: 2; }
+    #outputDiv { flex: 1; display: flex; flex-direction: column; padding: 10px; background-color: #f0f0f0; }
+    #console { flex-grow: 1; overflow-y: auto; background-color: white; border: 1px solid #ccc; padding: 10px; font-family: monospace; }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <div id="blocklyDiv"></div>
+    <div id="outputDiv">
+      <h3>Console Output</h3>
+      <div id="console"></div>
+      <button onclick="runCode()">Run Python Code</button>
+    </div>
+  </div>
+  <script>
+    const workspace = Blockly.inject('blocklyDiv', {
+      toolbox: `
+        <xml>
+          <category name="Logic" colour="%{BKY_LOGIC_HUE}">
+            <block type="controls_if"></block>
+            <block type="logic_compare"></block>
+            <block type="logic_operation"></block>
+          </category>
+          <category name="Loops" colour="%{BKY_LOOPS_HUE}">
+            <block type="controls_repeat_ext"></block>
+            <block type="controls_whileUntil"></block>
+          </category>
+          <category name="Math" colour="%{BKY_MATH_HUE}">
+            <block type="math_number"></block>
+            <block type="math_arithmetic"></block>
+          </category>
+          <category name="Text" colour="%{BKY_TEXTS_HUE}">
+            <block type="text"></block>
+            <block type="text_print"></block>
+          </category>
+        </xml>
+      `
+    });
 
-     <script>
-       const workspace = Blockly.inject('blocklyDiv', {
-         toolbox: `
-           <xml>
-             <category name="Logic" colour="%{BKY_LOGIC_HUE}">
-               <block type="controls_if"></block>
-               <block type="logic_compare"></block>
-               <block type="logic_operation"></block>
-             </category>
-             <category name="Loops" colour="%{BKY_LOOPS_HUE}">
-               <block type="controls_repeat_ext"></block>
-               <block type="controls_whileUntil"></block>
-             </category>
-             <category name="Math" colour="%{BKY_MATH_HUE}">
-               <block type="math_number"></block>
-               <block type="math_arithmetic"></block>
-             </category>
-             <category name="Text" colour="%{BKY_TEXTS_HUE}">
-               <block type="text"></block>
-               <block type="text_print"></block>
-             </category>
-           </xml>
-         `
-       });
+    let pyodide;
 
-       function generateCode() {
-         var code = Blockly.Python.workspaceToCode(workspace);
-         document.getElementById('codeOutput').textContent = code;
-       }
-     </script>
-   </body>
-   </html>
+    async function loadPyodide() {
+      pyodide = await loadPyodide();
+      console.log("Pyodide loaded");
+    }
+
+    loadPyodide();
+
+    async function runCode() {
+      if (!pyodide) {
+        console.log("Pyodide is still loading. Please wait.");
+        return;
+      }
+
+      const code = Blockly.Python.workspaceToCode(workspace);
+      const consoleElement = document.getElementById('console');
+      consoleElement.innerHTML = ''; // Clear previous output
+
+      try {
+        // Redirect Python's print function to our console div
+        pyodide.runPython(`
+          import sys
+          from js import document
+
+          class WebConsole:
+              def write(self, text):
+                  element = document.getElementById('console')
+                  element.innerHTML += text
+
+          sys.stdout = WebConsole()
+        `);
+
+        // Run the generated Python code
+        await pyodide.runPythonAsync(code);
+      } catch (error) {
+        consoleElement.innerHTML += `<span style="color: red;">Error: ${error.message}</span>`;
+      }
+    }
+  </script>
+</body>
+</html>
