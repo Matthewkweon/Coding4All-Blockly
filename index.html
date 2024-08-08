@@ -15,6 +15,7 @@
     #codeOutput { height: 150px; overflow-y: auto; background-color: #f0f0f0; border: 1px solid #ccc; padding: 10px; font-family: monospace; }
     #rightPanel { flex: 1; display: flex; flex-direction: column; margin-left: 20px; }
     #console { flex-grow: 1; overflow-y: auto; background-color: #f0f0f0; border: 1px solid #ccc; padding: 10px; font-family: monospace; }
+    #loadingMessage { color: red; }
   </style>
 </head>
 <body>
@@ -23,13 +24,14 @@
       <div id="blocklyDiv"></div>
       <div id="buttons">
         <button onclick="generateCode()">Generate Python Code</button>
-        <button onclick="runCode()">Run Code</button>
+        <button onclick="runCode()" id="runButton" disabled>Run Code</button>
       </div>
       <pre id="codeOutput"></pre>
     </div>
     <div id="rightPanel">
       <h3>Console Output</h3>
       <div id="console"></div>
+      <div id="loadingMessage">Loading Pyodide...</div>
     </div>
   </div>
 
@@ -65,25 +67,14 @@
 
     let pyodide;
 
-    async function loadPyodide() {
-      pyodide = await loadPyodide();
-      console.log("Pyodide loaded");
-    }
-
-    loadPyodide();
-
-    async function runCode() {
-      if (!pyodide) {
-        console.log("Pyodide is still loading. Please wait.");
-        return;
-      }
-
-      const code = Blockly.Python.workspaceToCode(workspace);
-      const consoleElement = document.getElementById('console');
-      consoleElement.innerHTML = ''; // Clear previous output
-
+    async function main() {
       try {
-        // Redirect Python's print function to our console div
+        pyodide = await loadPyodide();
+        console.log("Pyodide loaded");
+        document.getElementById('loadingMessage').style.display = 'none';
+        document.getElementById('runButton').disabled = false;
+
+        // Set up the Python environment
         pyodide.runPython(`
           import sys
           from js import document
@@ -95,7 +86,20 @@
 
           sys.stdout = WebConsole()
         `);
+      } catch (error) {
+        console.error("Failed to load Pyodide:", error);
+        document.getElementById('loadingMessage').textContent = "Failed to load Pyodide. Please refresh the page and try again.";
+      }
+    }
 
+    main();  // Start loading Pyodide immediately
+
+    async function runCode() {
+      const code = Blockly.Python.workspaceToCode(workspace);
+      const consoleElement = document.getElementById('console');
+      consoleElement.innerHTML = ''; // Clear previous output
+
+      try {
         // Run the generated Python code
         await pyodide.runPythonAsync(code);
       } catch (error) {
