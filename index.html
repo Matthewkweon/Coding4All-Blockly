@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Blockly Python Editor with Side Console</title>
+  <title>Blockly Python Editor with Variables and Side Console</title>
   <script src="https://unpkg.com/blockly/blockly.min.js"></script>
   <script src="https://unpkg.com/blockly/python_compressed.js"></script>
   <script src="https://cdn.jsdelivr.net/pyodide/v0.21.3/full/pyodide.js"></script>
@@ -39,6 +39,8 @@
     const workspace = Blockly.inject('blocklyDiv', {
       toolbox: `
         <xml>
+          <category name="Variables" custom="VARIABLE" colour="%{BKY_VARIABLES_HUE}">
+          </category>
           <category name="Logic" colour="%{BKY_LOGIC_HUE}">
             <block type="controls_if"></block>
             <block type="logic_compare"></block>
@@ -47,6 +49,23 @@
           <category name="Loops" colour="%{BKY_LOOPS_HUE}">
             <block type="controls_repeat_ext"></block>
             <block type="controls_whileUntil"></block>
+            <block type="controls_for">
+              <value name="FROM">
+                <shadow type="math_number">
+                  <field name="NUM">1</field>
+                </shadow>
+              </value>
+              <value name="TO">
+                <shadow type="math_number">
+                  <field name="NUM">10</field>
+                </shadow>
+              </value>
+              <value name="BY">
+                <shadow type="math_number">
+                  <field name="NUM">1</field>
+                </shadow>
+              </value>
+            </block>
           </category>
           <category name="Math" colour="%{BKY_MATH_HUE}">
             <block type="math_number"></block>
