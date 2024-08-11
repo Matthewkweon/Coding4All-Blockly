@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Blockly Python Editor with Lists and Functions</title>
+  <title>Blockly Python Editor with Lists, Functions, and User Input</title>
   <script src="https://unpkg.com/blockly/blockly.min.js"></script>
   <script src="https://unpkg.com/blockly/python_compressed.js"></script>
   <script src="https://cdn.jsdelivr.net/pyodide/v0.21.3/full/pyodide.js"></script>
@@ -36,6 +36,24 @@
   </div>
 
   <script>
+    Blockly.Blocks['user_input'] = {
+      init: function() {
+        this.appendDummyInput()
+            .appendField("ask user")
+            .appendField(new Blockly.FieldTextInput("Enter something:"), "PROMPT");
+        this.setOutput(true, "String");
+        this.setColour(160);
+        this.setTooltip("Get input from the user");
+        this.setHelpUrl("");
+      }
+    };
+
+    Blockly.Python['user_input'] = function(block) {
+      var prompt = block.getFieldValue('PROMPT');
+      var code = 'input("' + prompt + '")';
+      return [code, Blockly.Python.ORDER_FUNCTION_CALL];
+    };
+
     const toolbox = {
       kind: "categoryToolbox",
       contents: [
@@ -129,13 +147,20 @@
             { kind: "block", type: "text_trim" },
             { kind: "block", type: "text_print" }
           ]
+        },
+        {
+          kind: "category",
+          name: "Input",
+          colour: 160,
+          contents: [
+            { kind: "block", type: "user_input" }
+          ]
         }
       ]
     };
 
     const workspace = Blockly.inject('blocklyDiv', { toolbox: toolbox });
 
-    
     // Override Blockly's Python generator for variables
     Blockly.Python['variables_get'] = function(block) {
       var code = Blockly.Python.variableDB_.getName(block.getFieldValue('VAR'),
