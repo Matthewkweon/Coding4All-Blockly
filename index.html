@@ -36,24 +36,18 @@
   </div>
 
   <script>
-    // Define the custom block using JSON
-    Blockly.defineBlocksWithJsonArray([
-      {
-        "type": "user_input",
-        "message0": "ask user %1",
-        "args0": [
-          {
-            "type": "field_input",
-            "name": "PROMPT",
-            "text": "Enter something:"
-          }
-        ],
-        "output": "String",
-        "colour": 160,
-        "tooltip": "Get input from the user",
-        "helpUrl": ""
+    // Define the custom block
+    Blockly.Blocks['user_input'] = {
+      init: function() {
+        this.appendDummyInput()
+            .appendField("ask user")
+            .appendField(new Blockly.FieldTextInput("Enter something:"), "PROMPT");
+        this.setOutput(true, "String");
+        this.setColour(160);
+        this.setTooltip("Get input from the user");
+        this.setHelpUrl("");
       }
-    ]);
+    };
 
     // Define the Python generator for the custom block
     Blockly.Python['user_input'] = function(block) {
@@ -170,7 +164,13 @@
     const workspace = Blockly.inject('blocklyDiv', { toolbox: toolbox });
 
     function generateCode() {
+      console.log("Generating code...");
+      console.log("Registered block types:", Blockly.Blocks);
+      console.log("Registered Python generators:", Blockly.Python);
+      
       var code = Blockly.Python.workspaceToCode(workspace);
+      console.log("Generated code:", code);
+      
       // Remove any remaining None initializations
       code = code.replace(/^(\w+) = None\n/gm, '');
       document.getElementById('codeOutput').textContent = code;
