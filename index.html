@@ -195,7 +195,7 @@
         // Set up the Python environment
         pyodide.runPython(`
           import sys
-          from js import document
+          from js import document, prompt
 
           class WebConsole:
               def write(self, text):
@@ -203,6 +203,9 @@
                   element.innerHTML += text
 
           sys.stdout = WebConsole()
+
+          def input(prompt_text):
+              return prompt(prompt_text)
         `);
       } catch (error) {
         console.error("Failed to load Pyodide:", error);
