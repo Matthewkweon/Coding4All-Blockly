@@ -36,18 +36,26 @@
   </div>
 
   <script>
-    Blockly.Blocks['user_input'] = {
-      init: function() {
-        this.appendDummyInput()
-            .appendField("ask user")
-            .appendField(new Blockly.FieldTextInput("Enter something:"), "PROMPT");
-        this.setOutput(true, "String");
-        this.setColour(160);
-        this.setTooltip("Get input from the user");
-        this.setHelpUrl("");
+    // Define the custom block using JSON
+    Blockly.defineBlocksWithJsonArray([
+      {
+        "type": "user_input",
+        "message0": "ask user %1",
+        "args0": [
+          {
+            "type": "field_input",
+            "name": "PROMPT",
+            "text": "Enter something:"
+          }
+        ],
+        "output": "String",
+        "colour": 160,
+        "tooltip": "Get input from the user",
+        "helpUrl": ""
       }
-    };
+    ]);
 
+    // Define the Python generator for the custom block
     Blockly.Python['user_input'] = function(block) {
       var prompt = block.getFieldValue('PROMPT');
       var code = 'input("' + prompt + '")';
@@ -160,21 +168,6 @@
     };
 
     const workspace = Blockly.inject('blocklyDiv', { toolbox: toolbox });
-
-    // Override Blockly's Python generator for variables
-    Blockly.Python['variables_get'] = function(block) {
-      var code = Blockly.Python.variableDB_.getName(block.getFieldValue('VAR'),
-          Blockly.VARIABLE_CATEGORY_NAME);
-      return [code, Blockly.Python.ORDER_ATOMIC];
-    };
-
-    Blockly.Python['variables_set'] = function(block) {
-      var argument0 = Blockly.Python.valueToCode(block, 'VALUE',
-          Blockly.Python.ORDER_NONE) || '0';
-      var varName = Blockly.Python.variableDB_.getName(
-          block.getFieldValue('VAR'), Blockly.VARIABLE_CATEGORY_NAME);
-      return varName + ' = ' + argument0 + '\n';
-    };
 
     function generateCode() {
       var code = Blockly.Python.workspaceToCode(workspace);
