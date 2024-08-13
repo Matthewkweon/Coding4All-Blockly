@@ -39,17 +39,23 @@
     var workspace;
 
     function defineCustomBlocks() {
-      Blockly.Blocks['user_input'] = {
-        init: function() {
-          this.appendDummyInput()
-              .appendField("ask user")
-              .appendField(new Blockly.FieldTextInput("Enter something:"), "PROMPT");
-          this.setOutput(true, "String");
-          this.setColour(160);
-          this.setTooltip("Get input from the user");
-          this.setHelpUrl("");
+      Blockly.defineBlocksWithJsonArray([
+        {
+          "type": "user_input",
+          "message0": "ask user %1",
+          "args0": [
+            {
+              "type": "field_input",
+              "name": "PROMPT",
+              "text": "Enter something:"
+            }
+          ],
+          "output": "String",
+          "colour": 160,
+          "tooltip": "Get input from the user",
+          "helpUrl": ""
         }
-      };
+      ]);
 
       Blockly.Python['user_input'] = function(block) {
         var prompt = block.getFieldValue('PROMPT');
