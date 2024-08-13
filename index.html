@@ -49,6 +49,13 @@
       }
     };
 
+    // Register the Python code generator for the custom block
+    Blockly.Python['user_input'] = function(block) {
+      var prompt = block.getFieldValue('PROMPT');
+      var code = 'input("' + prompt + '")';
+      return [code, Blockly.Python.ORDER_FUNCTION_CALL];
+    };
+
     const toolbox = {
       kind: "categoryToolbox",
       contents: [
@@ -155,16 +162,6 @@
     };
 
     const workspace = Blockly.inject('blocklyDiv', { toolbox: toolbox });
-
-    // Explicitly register the Python generator for the custom block
-    Blockly.Python['user_input'] = function(block) {
-      var prompt = block.getFieldValue('PROMPT');
-      var code = 'input("' + prompt + '")';
-      return [code, Blockly.Python.ORDER_FUNCTION_CALL];
-    };
-
-    console.log("Custom block registered:", Blockly.Blocks['user_input']);
-    console.log("Custom block Python generator registered:", Blockly.Python['user_input']);
 
     function generateCode() {
       var code = Blockly.Python.workspaceToCode(workspace);
