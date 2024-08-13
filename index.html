@@ -246,25 +246,6 @@
       }
     }
 
-    window.onload = function() {
-  defineCustomBlocks();
-  workspace = Blockly.inject('blocklyDiv', { toolbox: toolbox });
-  
-  workspace.addChangeListener(function(event) {
-    if (event.type == Blockly.Events.BLOCK_CHANGE ||
-        event.type == Blockly.Events.BLOCK_CREATE ||
-        event.type == Blockly.Events.BLOCK_DELETE ||
-        event.type == Blockly.Events.BLOCK_MOVE) {
-      generateCode();
-    }
-  });
-
-  console.log("Workspace created, custom blocks should be available");
-  console.log("user_input generator after workspace creation:", Blockly.Python['user_input']);
-
-  setTimeout(generateCode, 1000);
-};
-
     main();
   </script>
 </body>
