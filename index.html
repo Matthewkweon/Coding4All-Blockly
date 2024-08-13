@@ -167,14 +167,9 @@
     console.log("Custom block Python generator registered:", Blockly.Python['user_input']);
 
     function generateCode() {
-      console.log("Generating code...");
-      console.log("Registered block types:", Object.keys(Blockly.Blocks));
-      console.log("Registered Python generators:", Object.keys(Blockly.Python));
-      
       var code = Blockly.Python.workspaceToCode(workspace);
-      console.log("Generated code:", code);
       
-      // Remove any remaining None initializations
+      // Clean code from None initializations
       code = code.replace(/^(\w+) = None\n/gm, '');
       document.getElementById('codeOutput').textContent = code;
     }
@@ -184,7 +179,6 @@
     async function main() {
       try {
         pyodide = await loadPyodide();
-        console.log("Pyodide loaded");
         document.getElementById('loadingMessage').style.display = 'none';
         document.getElementById('runButton').disabled = false;
 
@@ -213,7 +207,6 @@
 
     async function runCode() {
       const code = Blockly.Python.workspaceToCode(workspace);
-      // Remove any remaining None initializations before running
       const cleanedCode = code.replace(/^(\w+) = None\n/gm, '');
       const consoleElement = document.getElementById('console');
       consoleElement.innerHTML = ''; // Clear previous output
