@@ -164,17 +164,9 @@
     };
 
     function generateCode() {
-      console.log("Generating code...");
-      console.log("Available Python generators:", Object.keys(Blockly.Python));
-      console.log("user_input generator:", Blockly.Python['user_input']);
-      
       var code = '';
       try {
-        var blocks = workspace.getAllBlocks();
-        console.log("Blocks in workspace:", blocks.map(b => b.type));
-        
         code = Blockly.Python.workspaceToCode(workspace);
-        console.log("Generated code:", code);
       } catch (error) {
         console.error("Error generating code:", error);
         code = "Error generating code: " + error.message;
@@ -226,7 +218,7 @@
 
     function initBlockly() {
       workspace = Blockly.inject('blocklyDiv', { toolbox: toolbox });
-      
+
       workspace.addChangeListener(function(event) {
         if (event.type == Blockly.Events.BLOCK_CHANGE ||
             event.type == Blockly.Events.BLOCK_CREATE ||
@@ -236,15 +228,11 @@
         }
       });
 
-      console.log("Workspace created, custom blocks should be available");
-      console.log("user_input generator after workspace creation:", Blockly.Python['user_input']);
-
       setTimeout(generateCode, 1000);
     }
 
     // Wait for the page to load, then initialize Blockly
     window.addEventListener('load', function() {
-      console.log("Window loaded, initializing Blockly");
       initBlockly();
       main();
     });
