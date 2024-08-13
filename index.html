@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Blockly Python Editor with Lists, Functions, and User Input</title>
+  <title>Blockly Python Editor with Custom User Input Block</title>
   <script src="https://unpkg.com/blockly/blockly.min.js"></script>
   <script src="https://unpkg.com/blockly/python_compressed.js"></script>
   <script src="https://cdn.jsdelivr.net/pyodide/v0.21.3/full/pyodide.js"></script>
@@ -38,47 +38,25 @@
   <script>
     var workspace;
 
-    function defineCustomBlocks() {
-  Blockly.Blocks['user_input'] = {
-    init: function() {
-      this.appendDummyInput()
-          .appendField("ask user")
-          .appendField(new Blockly.FieldTextInput("Enter something:"), "PROMPT");
-      this.setOutput(true, "String");
-      this.setColour(160);
-      this.setTooltip("Get input from the user");
-      this.setHelpUrl("");
-    }
-  };
+    // Define the custom block
+    Blockly.Blocks['user_input'] = {
+      init: function() {
+        this.appendDummyInput()
+            .appendField("ask user")
+            .appendField(new Blockly.FieldTextInput("Enter something:"), "PROMPT");
+        this.setOutput(true, "String");
+        this.setColour(160);
+        this.setTooltip("Get input from the user");
+        this.setHelpUrl("");
+      }
+    };
 
-  Blockly.Python['user_input'] = function(block) {
-    var prompt = block.getFieldValue('PROMPT');
-    var code = 'input("' + prompt + '")';
-    return [code, Blockly.Python.ORDER_FUNCTION_CALL];
-  };
-
-  console.log("Custom block defined:", Blockly.Blocks['user_input']);
-  console.log("Python generator defined:", Blockly.Python['user_input']);
-}
-  defineCustomBlocks();
-
-  window.onload = function() {
-  workspace = Blockly.inject('blocklyDiv', { toolbox: toolbox });
-  
-  workspace.addChangeListener(function(event) {
-    if (event.type == Blockly.Events.BLOCK_CHANGE ||
-        event.type == Blockly.Events.BLOCK_CREATE ||
-        event.type == Blockly.Events.BLOCK_DELETE ||
-        event.type == Blockly.Events.BLOCK_MOVE) {
-      generateCode();
-    }
-  });
-
-  console.log("Workspace created, custom blocks should be available");
-  console.log("user_input generator after workspace creation:", Blockly.Python['user_input']);
-
-  setTimeout(generateCode, 1000);
-};
+    // Define the Python generator for the custom block
+    Blockly.Python['user_input'] = function(block) {
+      var prompt = block.getFieldValue('PROMPT');
+      var code = 'input("' + prompt + '")';
+      return [code, Blockly.Python.ORDER_FUNCTION_CALL];
+    };
 
     const toolbox = {
       kind: "categoryToolbox",
@@ -186,24 +164,24 @@
     };
 
     function generateCode() {
-  console.log("Generating code...");
-  console.log("Available Python generators:", Object.keys(Blockly.Python));
-  console.log("user_input generator:", Blockly.Python['user_input']);
-  
-  var code = '';
-  try {
-    var blocks = workspace.getAllBlocks();
-    console.log("Blocks in workspace:", blocks.map(b => b.type));
-    
-    code = Blockly.Python.workspaceToCode(workspace);
-    console.log("Generated code:", code);
-  } catch (error) {
-    console.error("Error generating code:", error);
-    code = "Error generating code: " + error.message;
-  }
-  
-  document.getElementById('codeOutput').textContent = code;
-}
+      console.log("Generating code...");
+      console.log("Available Python generators:", Object.keys(Blockly.Python));
+      console.log("user_input generator:", Blockly.Python['user_input']);
+      
+      var code = '';
+      try {
+        var blocks = workspace.getAllBlocks();
+        console.log("Blocks in workspace:", blocks.map(b => b.type));
+        
+        code = Blockly.Python.workspaceToCode(workspace);
+        console.log("Generated code:", code);
+      } catch (error) {
+        console.error("Error generating code:", error);
+        code = "Error generating code: " + error.message;
+      }
+      
+      document.getElementById('codeOutput').textContent = code;
+    }
 
     let pyodide;
 
@@ -246,7 +224,30 @@
       }
     }
 
-    main();
+    function initBlockly() {
+      workspace = Blockly.inject('blocklyDiv', { toolbox: toolbox });
+      
+      workspace.addChangeListener(function(event) {
+        if (event.type == Blockly.Events.BLOCK_CHANGE ||
+            event.type == Blockly.Events.BLOCK_CREATE ||
+            event.type == Blockly.Events.BLOCK_DELETE ||
+            event.type == Blockly.Events.BLOCK_MOVE) {
+          generateCode();
+        }
+      });
+
+      console.log("Workspace created, custom blocks should be available");
+      console.log("user_input generator after workspace creation:", Blockly.Python['user_input']);
+
+      setTimeout(generateCode, 1000);
+    }
+
+    // Wait for the page to load, then initialize Blockly
+    window.addEventListener('load', function() {
+      console.log("Window loaded, initializing Blockly");
+      initBlockly();
+      main();
+    });
   </script>
 </body>
 </html>
