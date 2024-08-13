@@ -36,7 +36,7 @@
   </div>
 
   <script>
-    var workspace; // Declare workspace in the global scope
+    var workspace;
 
     function defineCustomBlocks() {
       Blockly.Blocks['user_input'] = {
@@ -57,21 +57,8 @@
         return [code, Blockly.Python.ORDER_FUNCTION_CALL];
       };
 
-      // Define the custom 'example_textinput' block
-      Blockly.Blocks['example_textinput'] = {
-        init: function() {
-          this.appendDummyInput()
-              .appendField("text input:")
-              .appendField(new Blockly.FieldTextInput('default text'), 'FIELDNAME');
-          this.setOutput(true, "String");
-          this.setColour(160);
-        }
-      };
-
-      Blockly.Python['example_textinput'] = function(block) {
-        var text = block.getFieldValue('FIELDNAME');
-        return ['"' + text + '"', Blockly.Python.ORDER_ATOMIC];
-      };
+      console.log("Custom block defined:", Blockly.Blocks['user_input']);
+      console.log("Python generator defined:", Blockly.Python['user_input']);
     }
 
     const toolbox = {
@@ -173,8 +160,7 @@
           name: "Input",
           colour: 160,
           contents: [
-            { kind: "block", type: "user_input" },
-            { kind: "block", type: "example_textinput" }  
+            { kind: "block", type: "user_input" }
           ]
         }
       ]
@@ -205,7 +191,6 @@
         document.getElementById('loadingMessage').style.display = 'none';
         document.getElementById('runButton').disabled = false;
 
-        // Set up the Python environment
         pyodide.runPython(`
           import sys
           from js import document, prompt
@@ -230,10 +215,9 @@
       const code = Blockly.Python.workspaceToCode(workspace);
       const cleanedCode = code.replace(/^(\w+) = None\n/gm, '');
       const consoleElement = document.getElementById('console');
-      consoleElement.innerHTML = ''; // Clear previous output
+      consoleElement.innerHTML = '';
 
       try {
-        // Run the generated Python code
         await pyodide.runPythonAsync(cleanedCode);
       } catch (error) {
         consoleElement.innerHTML += `<span style="color: red;">Error: ${error.message}</span>`;
@@ -241,15 +225,9 @@
     }
 
     window.onload = function() {
-      workspace = Blockly.inject('blocklyDiv', { toolbox: toolbox });
       defineCustomBlocks();
+      workspace = Blockly.inject('blocklyDiv', { toolbox: toolbox });
       
-      setTimeout(function() {
-        console.log("Initial code generation:");
-        generateCode();
-      }, 1000);
-
-      // Add an event listener to update the code output whenever the workspace changes
       workspace.addChangeListener(function(event) {
         if (event.type == Blockly.Events.BLOCK_CHANGE ||
             event.type == Blockly.Events.BLOCK_CREATE ||
@@ -258,9 +236,11 @@
           generateCode();
         }
       });
+
+      setTimeout(generateCode, 1000);
     };
 
-    main();  // Start loading Pyodide immediately
+    main();
   </script>
 </body>
 </html>
