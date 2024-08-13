@@ -49,6 +49,15 @@
       }
     };
 
+    Blockly.Blocks['example_textinput'] = {
+    init: function() {
+      this.appendDummyInput()
+          .appendField("text input:")
+          .appendField(new Blockly.FieldTextInput('default text'),
+              'FIELDNAME');
+      }
+    };
+
     // Register the Python code generator for the custom block
     Blockly.Python['user_input'] = function(block) {
       var prompt = block.getFieldValue('PROMPT');
