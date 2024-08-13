@@ -59,11 +59,25 @@
     };
 
     // Register the Python code generator for the custom blocks
-    Blockly.Python['user_input'] = function(block) {
-      var prompt = block.getFieldValue('PROMPT');
-      var code = 'input("' + prompt + '")';
-      return [code, Blockly.Python.ORDER_FUNCTION_CALL];
-    };
+    function defineCustomBlocks() {
+  Blockly.Blocks['user_input'] = {
+    init: function() {
+      this.appendDummyInput()
+          .appendField("ask user")
+          .appendField(new Blockly.FieldTextInput("favorite animal?"), "PROMPT");
+      this.setOutput(true, "String");
+      this.setColour(160);
+      this.setTooltip("Get input from the user");
+      this.setHelpUrl("");
+    }
+  };
+
+  Blockly.Python['user_input'] = function(block) {
+    var prompt = block.getFieldValue('PROMPT');
+    var code = 'input("' + prompt + '")';
+    return [code, Blockly.Python.ORDER_FUNCTION_CALL];
+  };
+}
 
     // Define the toolbox with the new custom block
     const toolbox = {
@@ -173,14 +187,15 @@
     };
 
     const workspace = Blockly.inject('blocklyDiv', { toolbox: toolbox });
+    defineCustomBlocks();
 
     function generateCode() {
-      var code = Blockly.Python.workspaceToCode(workspace);
-      
-      // Clean code from None initializations
-      code = code.replace(/^(\w+) = None\n/gm, '');
-      document.getElementById('codeOutput').textContent = code;
-    }
+  console.log("Generating code...");
+  console.log("Available Python generators:", Object.keys(Blockly.Python));
+  var code = Blockly.Python.workspaceToCode(workspace);
+  console.log("Generated code:", code);
+  document.getElementById('codeOutput').textContent = code;
+}
 
     let pyodide;
 
