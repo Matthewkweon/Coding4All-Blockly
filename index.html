@@ -2,36 +2,99 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Blockly Python Editor with Custom User Input Block</title>
+  <title>Fun Python Coding with Blocky!</title>
   <script src="https://unpkg.com/blockly/blockly.min.js"></script>
   <script src="https://unpkg.com/blockly/python_compressed.js"></script>
   <script src="https://cdn.jsdelivr.net/pyodide/v0.21.3/full/pyodide.js"></script>
   <style>
-    body { font-family: Arial, sans-serif; }
-    #container { display: flex; }
+    body { 
+      font-family: 'Comic Sans MS', cursive, sans-serif; 
+      background-color: #f0f8ff; 
+      color: #333;
+    }
+    #container { 
+      display: flex; 
+      max-width: 1200px; 
+      margin: 0 auto;
+      padding: 20px;
+      background-color: white;
+      border-radius: 15px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
     #leftPanel { flex: 2; display: flex; flex-direction: column; }
-    #blocklyDiv { height: 480px; margin-bottom: 10px; }
-    #buttons { display: flex; justify-content: space-between; margin-bottom: 10px; }
-    #codeOutput { height: 150px; overflow-y: auto; background-color: #f0f0f0; border: 1px solid #ccc; padding: 10px; font-family: monospace; }
+    #blocklyDiv { 
+      height: 480px; 
+      margin-bottom: 10px; 
+      border: 3px solid #4CAF50;
+      border-radius: 10px;
+    }
+    #buttons { 
+      display: flex; 
+      justify-content: space-between; 
+      margin-bottom: 10px; 
+    }
+    #buttons button {
+      background-color: #4CAF50;
+      border: none;
+      color: white;
+      padding: 15px 32px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin: 4px 2px;
+      cursor: pointer;
+      border-radius: 12px;
+      transition: background-color 0.3s;
+    }
+    #buttons button:hover {
+      background-color: #45a049;
+    }
+    #codeOutput { 
+      height: 150px; 
+      overflow-y: auto; 
+      background-color: #f1f8e9; 
+      border: 2px solid #4CAF50; 
+      padding: 10px; 
+      font-family: 'Courier New', monospace;
+      border-radius: 10px;
+    }
     #rightPanel { flex: 1; display: flex; flex-direction: column; margin-left: 20px; }
-    #console { flex-grow: 1; overflow-y: auto; background-color: #f0f0f0; border: 1px solid #ccc; padding: 10px; font-family: monospace; }
-    #loadingMessage { color: red; }
+    #console { 
+      flex-grow: 1; 
+      overflow-y: auto; 
+      background-color: #e8f5e9; 
+      border: 2px solid #4CAF50; 
+      padding: 10px; 
+      font-family: 'Courier New', monospace;
+      border-radius: 10px;
+    }
+    #loadingMessage { color: #ff5722; }
+    #pythonCharacter {
+      width: 150px;
+      margin-bottom: 20px;
+    }
+    h1, h3 {
+      color: #4CAF50;
+    }
   </style>
 </head>
 <body>
+  <h1>Fun Python Coding with Blocky!</h1>
   <div id="container">
     <div id="leftPanel">
       <div id="blocklyDiv"></div>
       <div id="buttons">
-        <button onclick="generateCode()">Generate Python Code I hate this shit</button>
-        <button onclick="runCode()" id="runButton" disabled>Run Code</button>
+        <button onclick="generateCode()">Show Python Code</button>
+        <button onclick="runCode()" id="runButton" disabled>Run My Code!</button>
       </div>
       <pre id="codeOutput"></pre>
     </div>
     <div id="rightPanel">
+      <img id="pythonCharacter" src="/Users/matthewkweon/Downloads/Coding4All/snappy-python.png" alt="Python Character">
       <h3>Console Output</h3>
       <div id="console"></div>
-      <div id="loadingMessage">Loading Pyodide...</div>
+      <div id="loadingMessage">Loading the magic...</div>
     </div>
   </div>
 
